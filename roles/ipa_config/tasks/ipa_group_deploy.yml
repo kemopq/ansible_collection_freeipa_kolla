@@ -1,0 +1,19 @@
+---
+############################################################
+#  tasks file to add IPA group
+############################################################
+- name: Check if group has all needed params
+  assert:
+    that:
+      - ii_group.value.desc is defined
+    fail_msg: "Not all needed params provided for IPA group"
+    quiet: 'yes'
+
+- name: Add IPA group
+  freeipa.ansible_freeipa.ipagroup:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+    name: "{{ ii_group.key }}"
+    description: "{{ ii_group.value.desc }}"
+    gid: "{{ ii_group.value.gid | default(omit) }}"
+    external: "{{ ii_group.value.external | default(omit) }}"
+    state: present

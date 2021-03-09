@@ -1,0 +1,19 @@
+---
+############################################################
+#  tasks file for deleting openstack project with groups
+############################################################
+- name: Removing os roles from groups loop
+  include_tasks: "os_group_role_remove.yml"
+  when: ii_project.value.freeipa_groups is defined
+  loop: "{{ ii_project.value.freeipa_groups | dict2items }}"
+  loop_control:
+    loop_var: ii_group
+    label: "{{ ii_group.key }}"
+
+- name: Delete os project "{{ ii_project.key }}"
+  vars:
+    openstack_client_command:
+      "project delete --domain {{ ii_domain.key }} {{ ii_project.key }}"
+    cli_result: 'no'
+  include_tasks: "os_client.yml"
+  when: ii_project.key in os_project_list

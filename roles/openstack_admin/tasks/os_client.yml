@@ -1,0 +1,48 @@
+---
+- name: Check if itopenstack command exists
+  stat:
+    path: /usr/bin/itopenstack
+  register: stat_result
+
+- name: Set os_cmd (itopenstack)
+  set_fact:
+    os_cmd: "itopenstack {{ openstack_cloud_name }}"
+  when: (stat_result.stat.executable is defined) and stat_result.stat.executable and
+        (openstack_cloud_name is defined)
+
+- name: Set os_cmd (openstack)
+  set_fact:
+    os_cmd: "openstack"
+  when: (os_cmd is not defined)
+
+- name: "Running: openstack {{ openstack_client_command }}"
+  vars:
+    result_format: "{% if cli_result | bool %}--format json{% else %} {% endif %}"
+  command: "{{ os_cmd }} {{ openstack_client_command }} {{ result_format }}"
+  environment:
+    OS_AUTH_URL: "{{ openstack_url }}:5000/v3"
+    OS_USER_DOMAIN_NAME: "{{ openstack_user_domain_name }}"
+    OS_PROJECT_DOMAIN_NAME: "{{ openstack_project_domain_name }}"
+    OS_PROJECT_NAME: "{{ openstack_project_name }}"
+    OS_USERNAME: "{{ openstack_username }}"
+    OS_PASSWORD: "{{ openstack_user_password }}"
+  register: command_result
+
+- name: Return result of the openstack client command (result available - json)
+  set_fact:
+    osclient_result: "{{ command_result.stdout_lines | join(' ') | from_json }}"
+  when: (command_result.stdout_lines is defined) and (cli_result | bool)
+
+- name: Return result of the openstack client command (result available - no json)
+  set_fact:
+    osclient_result: "{{ command_result.stdout_lines }}"
+  when: (command_result.stdout_lines is defined) and (not cli_result | bool)
+
+- name: Return result of the openstack client command (result not available)
+  set_fact:
+    osclient_result: "Result not available"
+  when: command_result.stdout_lines is not defined
+
+- name: Print result of the openstack client command
+  debug:
+    var: osclient_result

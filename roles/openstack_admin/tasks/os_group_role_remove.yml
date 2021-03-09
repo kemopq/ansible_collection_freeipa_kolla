@@ -1,0 +1,19 @@
+---
+############################################################
+#  tasks file for removing role from os group
+############################################################
+- name: DEBUG
+  debug:
+    var: os_project_list
+
+- name: Remove role from group
+  vars:
+    group_id: "{{ os_groups_ids[ii_group.key] }}"
+    openstack_client_command:
+      "role remove --group {{ group_id }} --project {{ ii_project.key }}
+                   --group-domain {{ ii_domain.key }} {{ ii_group.value.openstack_role }}"
+    cli_result: 'no'
+  include_tasks: "os_client.yml"
+  when: ii_project.key in os_project_list and
+        ii_domain.key in os_domain_list and
+        ii_group.key in os_groups_ids

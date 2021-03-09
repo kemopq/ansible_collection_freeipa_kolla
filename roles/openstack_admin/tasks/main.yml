@@ -1,0 +1,10 @@
+---
+- name: "Check virt_resources_action variable"
+  assert:
+    that:
+      - (freeipa_kolla_action == 'deploy') or (freeipa_kolla_action == 'destroy')
+    fail_msg: "Wrong value of freeipa_kolla_action variable = {{ freeipa_kolla_action }}"
+    quiet: 'yes'
+
+- name: "include tasks {{ freeipa_kolla_action }}.yml"
+  include_tasks: "{{ freeipa_kolla_action }}.yml"

@@ -1,0 +1,37 @@
+---
+############################################################
+#  tasks file to add IPA user
+############################################################
+- name: Check if user has all needed params
+  assert:
+    that:
+      - ii_user.value.first is defined
+      - ii_user.value.last is defined
+    fail_msg: "Not all needed params provided for IPA user"
+    quiet: 'yes'
+
+- name: Add IPA user
+  freeipa.ansible_freeipa.ipauser:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+    name: "{{ ii_user.key }}"
+    first: "{{ ii_user.value.first }}"
+    last: "{{ ii_user.value.last }}"
+    fullname: "{{ ii_user.value.fullname | default(omit) }}"
+    displayname: "{{ ii_user.value.displayname | default(omit) }}"
+    homedir: "{{ ii_user.value.homedir | default(omit) }}"
+    uid: "{{ ii_user.value.uid | default(omit) }}"
+    gid: "{{ ii_user.value.gid | default(omit) }}"
+    phone: "{{ ii_user.value.phone | default(omit) }}"
+    email: "{{ ii_user.value.email | default(omit) }}"
+    password: "{{ ii_user.value.password | default(omit) }}"
+    state: present
+
+- name: Add IPA user to IPA group
+  freeipa.ansible_freeipa.ipagroup:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+    name: "{{ item }}"
+    action: "member"
+    user: "{{ ii_user.key }}"
+    state: present
+  loop: "{{ ii_user.value.group }}"
+  when: (ii_user.value.group is defined)

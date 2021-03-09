@@ -1,0 +1,50 @@
+<domain type='kvm'>
+  <name>{{server_name}}</name>
+  <memory unit='MiB'>{{server_memory_usage}}</memory>
+  <vcpu placement='static'>{{server_cpu_usage}}</vcpu>
+  <os>
+    <type arch='x86_64'>hvm</type>
+{% if (uefi_loader is defined) and (uefi_loader != '')%}
+    {{ uefi_loader }}
+    {{ uefi_nvram }}
+{% endif %}
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <cpu mode='host-model' check='partial'>
+    <model fallback='allow'/>
+  </cpu>
+  <clock offset='utc'>
+  </clock>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+{% for volume in volumes %}
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='{{ vol_pool.path }}/{{ vmtype_name }}-{{ volume.name }}-node{{ index }}.qcow2'/>
+      <target dev='{{ volume.dev }}' bus='virtio'/>
+{% if volume.boot_order is defined %}
+      <boot order='1'/>
+{% endif %}
+    </disk>
+{% endfor %}
+{% for interface in interfaces %}
+    <interface type='{{ interface.type }}'>
+      <source {{ interface.type }}='{{ interface.network }}'/>
+      <model type='virtio'/>
+{% if interface.boot_order is defined %}
+      <boot order='{{ interface.boot_order }}'/>
+{% endif %}
+    </interface>
+{% endfor %}
+    <console type='pty'>
+      <target type='serial'/>
+    </console>
+    <graphics type='spice' port='-1' autoport='yes'/> 
+  </devices>
+</domain>
+

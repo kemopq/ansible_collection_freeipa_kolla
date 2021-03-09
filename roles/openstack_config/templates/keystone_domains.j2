@@ -1,0 +1,41 @@
+[identity]
+
+driver = ldap
+
+[ldap]
+
+# debug_level = 4095
+url = "ldap://{{ ipa_fqdn }}"
+
+user = uid={{ user }},cn=users,cn=accounts,{{ dc_suffix }}
+password = {{ passwd }}
+suffix = {{ dc_suffix }}
+query_scope = sub
+user_tree_dn = cn=users,cn=accounts,{{ dc_suffix }}
+# user_filter = (memberOf=cn=osadmins,cn=groups,cn=accounts,{{ dc_suffix }})
+# user_objectclass = inetUser
+user_id_attribute = uid
+
+# this is what is searched on
+user_name_attribute = uid
+user_mail_attribute = mail
+
+# user_pass_attribute =
+# XXX FIXME -mfisch: wont work on freeIPA like this
+# user_enabled_attribute = (nsAccountLock=False)
+user_allow_create = False
+user_allow_update = False
+user_allow_delete = False
+group_tree_dn = cn=groups,cn=accounts,{{ dc_suffix }}
+
+# group_filter =
+# group_objectclass = groupOfNames
+group_id_attribute = cn
+group_name_attribute = cn
+group_member_attribute = member
+group_desc_attribute = description
+
+# group_attribute_ignore =
+group_allow_create = False
+group_allow_update = False
+group_allow_delete = False

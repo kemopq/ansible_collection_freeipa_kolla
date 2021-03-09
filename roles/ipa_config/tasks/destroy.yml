@@ -1,0 +1,19 @@
+---
+############################################################
+#  tasks file to remove configuration of FreeIPA
+############################################################
+- name: IPA users loop
+  include_tasks: ipa_user_destroy.yml
+  loop: "{{ freeipa_users | dict2items }}"
+  loop_control:
+    loop_var: ii_user
+    label: "{{ ii_user.key }}"
+  when: (freeipa_users is defined)
+
+- name: IPA groups loop
+  include_tasks: ipa_group_destroy.yml
+  loop: "{{ freeipa_groups | dict2items }}"
+  loop_control:
+    loop_var: ii_group
+    label: "{{ ii_group.key }}"
+  when: (freeipa_groups is defined)

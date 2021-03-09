@@ -1,0 +1,19 @@
+---
+############################################################
+#  tasks file for adding role to os group
+############################################################
+- name: Check if group exists
+  assert:
+    that:
+      - (ii_group.key in os_groups_ids)
+    fail_msg: "Openstack/FreeIPA group {{ ii_group.key }} is not defined"
+    quiet: 'yes'
+
+- name: Add role to group
+  vars:
+    group_id: "{{ os_groups_ids[ii_group.key] }}"
+    openstack_client_command:
+      "role add --group {{ group_id }} --project {{ ii_project.key }}
+                --group-domain {{ ii_domain.key }} {{ ii_group.value.openstack_role }}"
+    cli_result: 'no'
+  include_tasks: "os_client.yml"

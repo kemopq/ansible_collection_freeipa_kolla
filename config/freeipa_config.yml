@@ -1,0 +1,14 @@
+---
+# Configuration parameters for setting IPA server and replicas with freeipa.ansible_freeipa collection
+# ipa server params
+ipaserver_domain: 'example.test'
+ipaserver_realm: 'EXAMPLE.TEST'
+ipaadmin_password: 'mypasswd'
+ipadm_password: "mypasswd"
+ipaserver_setup_dns: 'yes'
+ipaserver_forwarders:
+  - '1.2.3.4'
+# ipa replica params
+ipareplica_setup_dns: 'yes'
+ipareplica_forwarders:
+  - '1.2.3.4'

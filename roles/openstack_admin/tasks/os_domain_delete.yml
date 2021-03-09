@@ -1,0 +1,49 @@
+---
+###################################################################
+#  tasks file for delete os domain whith its projects and groups
+###################################################################
+- name: List os groups of domain "{{ ii_domain.key }}"
+  vars:
+    openstack_client_command: "group list --domain {{ ii_domain.key }}"
+    cli_result: 'yes'
+  include_tasks: "os_client.yml"
+
+- name: Set fact dict of groups and its ids
+  set_fact:
+    os_groups_ids: "{{  osclient_result | kemopq.freeipa_kolla.os_group_list }}"
+
+- name: List current os projects of domain "{{ ii_domain.key }}"
+  vars:
+    openstack_client_command: "project list --domain {{ ii_domain.key }}"
+    cli_result: 'yes'
+  include_tasks: "os_client.yml"
+
+- name: Make os projects list
+  set_fact:
+    os_project_list: "{{ osclient_result | kemopq.freeipa_kolla.os_project_list }}"
+
+- name: Delete os projects of domain "{{ ii_domain.key }}" loop
+  include_tasks: "os_project_delete.yml"
+  when: ii_domain.value.openstack_projects is defined
+  loop: "{{ ii_domain.value.openstack_projects | dict2items }}"
+  loop_control:
+    loop_var: ii_project
+    label: "{{ ii_project.key }}"
+
+- name: Caveat
+  debug:
+    msg: "!!! Domain can not be removed if users in domain are still active. First remove users from FreeIPA and then run the script again !!!"
+
+- name: Disable os domain
+  vars:
+    openstack_client_command: "domain set --disable {{ ii_domain.key }}"
+    cli_result: 'no'
+  include_tasks: "os_client.yml"
+  when: ii_domain.key in os_domain_list
+
+- name: Delete os domain
+  vars:
+    openstack_client_command: "domain delete {{ ii_domain.key }}"
+    cli_result: 'no'
+  include_tasks: "os_client.yml"
+  when: ii_domain.key in os_domain_list

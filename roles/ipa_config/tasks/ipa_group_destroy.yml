@@ -1,0 +1,9 @@
+---
+############################################################
+#  tasks file to remove IPA group
+############################################################
+- name: Remove IPA group
+  freeipa.ansible_freeipa.ipagroup:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+    name: "{{ ii_group.key }}"
+    state: absent

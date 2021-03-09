@@ -1,0 +1,19 @@
+---
+############################################################
+#  tasks file to remove IPA user
+############################################################
+- name: Remove IPA user from IPA group
+  freeipa.ansible_freeipa.ipagroup:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+    name: "{{ item }}"
+    action: "member"
+    user: "{{ ii_user.key }}"
+    state: absent
+  loop: "{{ ii_user.value.group }}"
+  when: (ii_user.value.group is defined)
+
+- name: Remove IPA user
+  freeipa.ansible_freeipa.ipauser:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+    name: "{{ ii_user.key }}"
+    state: absent

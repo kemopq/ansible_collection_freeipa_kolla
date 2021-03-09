@@ -1,0 +1,8 @@
+[ipaserver]
+freeipa-server-node1.example.test ansible_user=root
+
+[openstack_deployment_srv]
+faikolla-node1.example.test ansible_user=root
+
+[openstack_client]
+localhost    ansible_connection=local

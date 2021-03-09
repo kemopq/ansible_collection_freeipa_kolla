@@ -1,0 +1,35 @@
+# static configuration
+network:
+  version: 2
+  ethernets:
+{% for interface in interfaces %}
+{% if interface.interface_name is defined %}
+{% set interface_name = interface.interface_name %}
+{% else %}
+{% set interface_id =  interface.interface_name_id | int + 3 %}
+{% set interface_name = 'ens' + interface_id | string %}
+{% endif %}
+    "{{ interface_name }}":
+{% if interface.address_cidr is defined %}
+      dhcp4: no
+      addresses: ["{{ interface.address_cidr | next_nth_usable(index | int ) }}/{{ interface.address_cidr | ipaddr('prefix') }}"]
+{% else %}
+      dhcp4: yes
+{% endif %}
+{% if interface.gateway is defined %}
+      gateway4: "{{ interface.gateway }}"
+{% endif %}
+{% if interface.nameservers is defined %}
+      nameservers:
+{% if (interface.search_domains is defined) and (interface.search_domains|length > 0) %}
+        search:
+{% for search_domain in interface.search_domains %}
+          - "{{ search_domain }}"
+{% endfor %}
+{% endif %}
+        addresses:
+{% for nameserver in interface.nameservers %}
+          - "{{ nameserver }}"
+{% endfor %}
+{% endif %}
+{% endfor %}

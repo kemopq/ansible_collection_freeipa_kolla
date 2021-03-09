@@ -1,0 +1,125 @@
+---
+############################################################
+#  PLAY on freeipa_server host
+############################################################
+- name: Prepare freeipa server
+  hosts: ipaserver
+  gather_facts: 'no'
+
+  collections:
+    - freeipa.ansible_freeipa
+    - kemopq.freeipa_kolla
+
+  tasks:
+    - name: Gather facts from freeipa server
+      setup:
+        gather_subset:
+          - 'min'
+      tags:
+        - ipaserver
+
+    - name: Import ipaserver role
+      vars:
+        state: "{% if ciaction == 'destroy' %}absent{% else %}present{% endif %}"
+      import_role:
+        name: "ipaserver"
+      tags:
+        - ipaserver
+
+    - name: Import ipa_config role
+      vars:
+        freeipa_kolla_action: "{{ ciaction }}"
+      import_role:
+        name: "ipa_config"
+      tags:
+        - ipaconfig
+
+############################################################
+#  PLAY on freeipa_replica host
+############################################################
+- name: Prepare freeipa replica
+  hosts: ipareplicas
+  gather_facts: 'no'
+
+  collections:
+    - freeipa.ansible_freeipa
+
+  tasks:
+    - name: Gather facts from freeipa replica
+      setup:
+        gather_subset:
+          - 'min'
+      tags:
+        - ipareplica
+
+    - name: Import ipareplica role
+      vars:
+        state: "{% if ciaction == 'destroy' %}absent{% else %}present{% endif %}"
+      import_role:
+        name: "ipareplica"
+      tags:
+        - ipareplica
+
+############################################################
+#  PLAY on freeipa_client host
+############################################################
+- name: Prepare freeipa client
+  hosts: ipaclients
+  gather_facts: 'no'
+
+  collections:
+    - freeipa.ansible_freeipa
+
+  tasks:
+    - name: Gather facts from freeipa client
+      setup:
+        gather_subset:
+          - 'min'
+      tags:
+        - ipaclient
+
+    - name: Import ipaclient role
+      vars:
+        state: "{% if ciaction == 'destroy' %}absent{% else %}present{% endif %}"
+      import_role:
+        name: "ipaclient"
+      tags:
+        - ipaclient
+
+############################################################
+#  PLAY on openstack_deployment_srv (fai_kolla) host
+############################################################
+- name: Prepare Keystone and Horizon configuration files
+  hosts: openstack_deployment_srv
+  gather_facts: 'no'
+
+  collections:
+    - kemopq.freeipa_kolla
+
+  tasks:
+    - name: Import openstack_config role
+      vars:
+        freeipa_kolla_action: "{{ ciaction }}"
+      import_role:
+        name: "openstack_config"
+      tags:
+        - osconfig
+
+############################################################
+#  PLAY on openstack_client host
+############################################################
+- name: Prepare openstack domains and projects
+  hosts: openstack_client
+  gather_facts: 'no'
+
+  collections:
+    - kemopq.freeipa_kolla
+
+  tasks:
+    - name: Import openstack_admin role
+      vars:
+        freeipa_kolla_action: "{{ ciaction }}"
+      import_role:
+        name: "openstack_admin"
+      tags:
+        - osadmin

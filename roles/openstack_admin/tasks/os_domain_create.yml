@@ -1,0 +1,38 @@
+---
+###################################################################
+#  tasks file for creating os domain whith its projects and groups
+###################################################################
+- name: Create os domain
+  vars:
+    openstack_client_command: "domain create --description '{{ ii_domain.value.description }}'  {{ ii_domain.key }}"
+    cli_result: 'no'
+  include_tasks: "os_client.yml"
+  when: ii_domain.key not in os_domain_list
+
+- name: List os groups of domain "{{ ii_domain.key }}"
+  vars:
+    openstack_client_command: "group list --domain {{ ii_domain.key }}"
+    cli_result: 'yes'
+  include_tasks: "os_client.yml"
+
+- name: Set fact dict of groups and its ids
+  set_fact:
+    os_groups_ids: "{{  osclient_result | kemopq.freeipa_kolla.os_group_list }}"
+
+- name: List current os projects of domain "{{ ii_domain.key }}"
+  vars:
+    openstack_client_command: "project list --domain {{ ii_domain.key }}"
+    cli_result: 'yes'
+  include_tasks: "os_client.yml"
+
+- name: Make os projects list
+  set_fact:
+    os_project_list: "{{ osclient_result | kemopq.freeipa_kolla.os_project_list }}"
+
+- name: Create os projects of domain "{{ ii_domain.key }}" loop
+  include_tasks: "os_project_create.yml"
+  when: ii_domain.value.openstack_projects is defined
+  loop: "{{ ii_domain.value.openstack_projects | dict2items }}"
+  loop_control:
+    loop_var: ii_project
+    label: "{{ ii_project.key }}"

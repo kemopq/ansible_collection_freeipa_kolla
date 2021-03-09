@@ -1,0 +1,7 @@
+---
+openstack_url: "http://unknown"
+openstack_user_domain_name: "Default"
+openstack_project_domain_name: "Default"
+openstack_project_name: "admin"
+openstack_username: "admin"
+openstack_user_password: "unknown"
