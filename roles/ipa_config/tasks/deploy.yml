@@ -2,6 +2,20 @@
 ############################################################
 #  tasks file to configure FreeIPA
 ############################################################
+- name: IPA global forwarders loop
+  include_tasks: ipa_global_forwarder_deploy.yml
+  loop: "{{ global_forwarders }}"
+  loop_control:
+    loop_var: ii_global_forwarder
+  when: (global_forwarders is defined)
+
+- name: IPA zone forwarders loop
+  include_tasks: ipa_zone_forwarder_deploy.yml
+  loop: "{{ zone_forwarders }}"
+  loop_control:
+    loop_var: ii_zone_forwarder
+  when: (zone_forwarders is defined)
+
 - name: IPA groups loop
   include_tasks: ipa_group_deploy.yml
   loop: "{{ freeipa_groups | dict2items }}"
@@ -17,3 +31,11 @@
     loop_var: ii_user
     label: "{{ ii_user.key }}"
   when: (freeipa_users is defined)
+
+- name: IPA DNS records block
+  include_tasks: ipa_insert_cloud_name_deploy.yml
+  loop: "{{ clouds | dict2items }}"
+  loop_control:
+    loop_var: ii_cloud
+    label: "{{ ii_cloud.key }}"
+  when: (clouds is defined)

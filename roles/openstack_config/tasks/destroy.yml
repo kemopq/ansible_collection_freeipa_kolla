@@ -1,45 +1,12 @@
 ---
-# Keystone
-- name: Remove identity section to keystone.conf - 1st param
-  ini_file:
-    path: "{{ openstack_conf_path }}/keystone.conf"
-    section: identity
-    option: domain_specific_drivers_enabled
-    state: absent
-
-- name: Remove identity section to keystone.conf - 2nd param
-  ini_file:
-    path: "{{ openstack_conf_path }}/keystone.conf"
-    section: identity
-    option: domain_config_dir
-    state: absent
-
-- name: Remove keystone domains files
-  file:
-    path: "{{ openstack_conf_path }}/keystone/domains/keystone.{{ item.key }}.conf"
-    state: absent
-  loop: "{{ openstack_domains | dict2items }}"
-  when: (openstack_domains is defined)
-
-
-# Horizon
-- name: Remove horizon multidomain support - 1st param
-  lineinfile:
-    path: "{{ openstack_conf_path }}/horizon/local_settings"
-    regexp: ".*OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT.*"
-    state: absent
-
-- name: Remove horizon multidomain support - 2nd param
-  lineinfile:
-    path: "{{ openstack_conf_path }}/horizon/local_settings"
-    regexp: ".*OPENSTACK_KEYSTONE_DOMAIN_DROPDOWN.*"
-    state: absent
-
-- name: Remove horizon multidomain support - 3rd param
-  lineinfile:
-    path: "{{ openstack_conf_path }}/horizon/local_settings"
-    insertafter: 'OPENSTACK_KEYSTONE_DOMAIN_CHOICES'
-    regex: ".*{{ item.key }}.*"
-    state: absent
-  loop: "{{ openstack_domains | dict2items }}"
-  when: (openstack_domains is defined)
+############################################################
+#  tasks file to remove configuration of Openstack
+############################################################
+- name: Config cloud block
+  include_tasks: cloud_config_destroy.yml
+  loop: "{{ clouds | dict2items }}"
+  loop_control:
+    loop_var: ii_cloud
+    label: "{{ ii_cloud.key }}"
+  when: (clouds is defined) and
+        ((ii_cloud.value.faikolla_srv is not defined) or (ii_cloud.value.virtualization_host == inventory_hostname_short))

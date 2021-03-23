@@ -1,9 +1,6 @@
 #########################################
-# hello_world collection's filter plugins
+# freeipa_kolla collection's filters
 #########################################
-import sys
-import json
-
 
 # Converts domain string in the following format:
 # "first.second.third" --> "dc=first,dc=second,dc=third"

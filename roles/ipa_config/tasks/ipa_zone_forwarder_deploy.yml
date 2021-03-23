@@ -1,0 +1,14 @@
+---
+- name: Set zone forwarder
+  freeipa.ansible_freeipa.ipadnsforwardzone:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+    name: "{{ ii_zone_forwarder.zone }}"
+    forwarders:
+      - ip_address: "{{ item.ip }}"
+        port: "{{ item.port | default(omit) }}"
+    forwardpolicy: "{{ ii_zone_forwarder.policy }}"
+    skip_overlap_check: "{{ ii_zone_forwarder.skip_overlap_check | default(omit) }}"
+    permission: "{{ ii_zone_forwarder.permission | default(omit) }}"
+    action: "{{ ii_zone_forwarder.action | default(omit) }}"
+    state: present
+  loop: "{{ ii_zone_forwarder.forwarders }}"

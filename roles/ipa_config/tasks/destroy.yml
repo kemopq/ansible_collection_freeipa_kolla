@@ -2,6 +2,14 @@
 ############################################################
 #  tasks file to remove configuration of FreeIPA
 ############################################################
+- name: IPA DNS records block
+  include_tasks: ipa_insert_cloud_name_destroy.yml
+  loop: "{{ clouds | dict2items }}"
+  loop_control:
+    loop_var: ii_cloud
+    label: "{{ ii_cloud.key }}"
+  when: (clouds is defined)
+
 - name: IPA users loop
   include_tasks: ipa_user_destroy.yml
   loop: "{{ freeipa_users | dict2items }}"

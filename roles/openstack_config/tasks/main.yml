@@ -1,5 +1,5 @@
 ---
-- name: "Check virt_resources_action variable"
+- name: "Check freeipa_kolla_action variable"
   assert:
     that:
       - (freeipa_kolla_action == 'deploy') or (freeipa_kolla_action == 'destroy')

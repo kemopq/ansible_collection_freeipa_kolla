@@ -1,21 +1,12 @@
 ---
 ############################################################
-#  tasks file for removing all entities from openstack
+#  tasks file to remove admin. Openstack
 ############################################################
-- name: List current os domains
-  vars:
-    openstack_client_command: "domain list"
-    cli_result: 'yes'
-  include_tasks: "os_client.yml"
-
-- name: Make os domains list
-  set_fact:
-    os_domain_list: "{{ osclient_result | kemopq.freeipa_kolla.os_domain_list }}"
-
-- name: Delete os domains loop
-  include_tasks: "os_domain_delete.yml"
-  when: openstack_domains is defined
-  loop: "{{ openstack_domains | dict2items }}"
+- name: Admin cloud block
+  include_tasks: os_domains_destroy.yml
+  loop: "{{ clouds | dict2items }}"
   loop_control:
-    loop_var: ii_domain
-    label: "{{ ii_domain.key }}"
+    loop_var: ii_cloud
+    label: "{{ ii_cloud.key }}"
+  when: (clouds is defined) and
+        ((ii_cloud.value.faikolla_srv is not defined) or (ii_cloud.value.faikolla_srv == inventory_hostname_short))

@@ -1,0 +1,11 @@
+---
+- name: Set global forwarder
+  freeipa.ansible_freeipa.ipadnsconfig:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+    forwarders:
+      - ip_address: "{{ item.ip }}"
+        port: "{{ item.port | default(omit) }}"
+    forward_policy: "{{ ii_global_forwarder.policy }}"
+    allow_sync_ptr: "{{ ii_global_forwarder.allow_sync_ptr | default(omit) }}"
+    state: present
+  loop: "{{ ii_global_forwarder.forwarders }}"

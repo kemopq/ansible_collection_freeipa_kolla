@@ -2,10 +2,6 @@
 ############################################################
 #  tasks file for removing role from os group
 ############################################################
-- name: DEBUG
-  debug:
-    var: os_project_list
-
 - name: Remove role from group
   vars:
     group_id: "{{ os_groups_ids[ii_group.key] }}"

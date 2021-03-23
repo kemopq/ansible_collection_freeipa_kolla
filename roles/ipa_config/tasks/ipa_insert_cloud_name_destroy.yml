@@ -1,0 +1,9 @@
+---
+- name: Delete DNS record of cloud "{{ ii_cloud.key }}"
+  freeipa.ansible_freeipa.ipadnsrecord:
+    ipaadmin_password: "{{ ipaadmin_password }}"
+    zone_name: "{{ ipaserver_domain }}"
+    record_type: 'A'
+    name: "{{ ii_cloud.value.public_name }}"
+    record_value: "{{ ii_cloud.value.public_ip }}"
+    state: absent
