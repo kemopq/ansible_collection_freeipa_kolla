@@ -6,9 +6,16 @@ ipaserver_realm: 'EXAMPLE.TEST'
 ipaadmin_password: 'mypasswd'
 ipadm_password: "mypasswd"
 ipaserver_setup_dns: 'yes'
+# ipaserver_auto_forwarders: 'yes'
+# ipaserver_no_forwarders: 'yes'
 ipaserver_forwarders:
   - '1.2.3.4'
+
 # ipa replica params
 ipareplica_setup_dns: 'yes'
 ipareplica_forwarders:
   - '1.2.3.4'
+
+# ipa client params
+ipasssd_enable_dns_updates: 'yes'
+ipaclient_mkhomedir: 'yes'

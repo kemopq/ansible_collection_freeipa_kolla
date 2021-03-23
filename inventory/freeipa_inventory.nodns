@@ -1,0 +1,18 @@
+[libvirt_host]
+localhost    ansible_connection=local
+
+[ipaserver]
+freeipa-server-node1.kemopq.test ansible_user=root
+
+[ipareplicas]
+freeipa-replica-node1.kemopq.test ansible_user=root ipareplica_servers=freeipa-server-node1.kemopq.test
+
+[ipaclients]
+freeipa-client-node1.kemopq.test ansible_user=root ipaclient_servers=freeipa-server-node1.kemopq.test
+
+[openstack_deployment_srv]
+# localhost    ansible_connection=local
+faikolla-node1.kemopq.test ansible_user=root
+
+[openstack_client]
+localhost    ansible_connection=local

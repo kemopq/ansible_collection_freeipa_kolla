@@ -1,6 +1,5 @@
 [virtualization_host]
 localhost    ansible_connection=local
-vmcloud-srv  ansible_user=ubuntu
 
 [ipaserver]
 freeipa-server-node1.kemopq.test ansible_user=root
@@ -8,9 +7,13 @@ freeipa-server-node1.kemopq.test ansible_user=root
 [ipareplicas]
 freeipa-replica-node1.kemopq.test ansible_user=root
 
+[ipaclients]
+# freeipa-client1-node1.kemopq.test ansible_user=root
+# freeipa-client2-node1.kemopq.test ansible_user=root
+freeipa-client3-node1.kemopq.test ansible_user=root
+
 [openstack_deployment_srv]
-faikolla1-node1.kemopq.test ansible_user=root
-faikolla2-node1.kemopq.test ansible_user=root
+faikolla-node1.kemopq.test ansible_user=root
 
 [openstack_client]
 localhost    ansible_connection=local

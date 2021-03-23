@@ -1,16 +1,33 @@
 ---
-# IPA
-freeipa_servers:                   # list of IPA servers (FQDNs)
-  - "freeipa-server-node1.example.test"
+# FORWARDERS
+# Global forwarders
+global_forwarders:
+  - policy: 'first'      # only/first
+    forwarders:
+      - ip: '10.1.2.3'
+        # port: '56'
 
-# predefined IPA groups
+# Zone forwarders
+# zone_forwarders:
+#   - zone: 'iskratel.mak'
+#     policy: 'only'      # only/first
+#     forwarders:
+#       - ip: '172.18.138.129'
+#         # port: '56'
+
+# DNSSEC
+dnssec_disable: 'yes'
+
+# default IPA users and groups
+freeipa_servers:
+  - "freeipa-server-node1.{{ ipaserver_domain }}"
+
 freeipa_groups:
   osadmins:
     desc: "Openstack admin group"
   osmembers:
     desc: "Openstack member group"
 
-# predefined IPA users
 freeipa_users:
   keyadmin:
     first: "Keystone"
@@ -30,9 +47,6 @@ freeipa_users:
       - osmembers
 
 # openstack
-openstack_conf_path: "/opt/etc-kolla/vmcloud/config"  # location of configuration overrides (node_custom_config in kolla ansible globals.yml)
-
-# list of openstack domains with projects and associated user groups (defined in IPA)
 openstack_domains:
   kemopq_domain:
     description: "Creted by FreeIPA install script"
@@ -50,5 +64,18 @@ openstack_domains:
           osmembers:
             openstack_role: "admin"
 
-openstack_url: "http://192.168.100.19"    # Openstack API URL
-openstack_user_password: "iskratel"       # admin user password
+clouds:
+  vmcloud1:
+    faikolla_srv: "faikolla1-node1"
+    openstack_conf_path: "/opt/cloud-cfg/vmcloud1/config"  # location of configuration overrides (node_custom_config in kolla ansible globals.yml)
+    public_ip: "192.168.100.19"
+    public_name: "vmcloud1"
+    public_int_tls: "no"
+    admin_passwd: "iskratel"
+  vmcloud2:
+    faikolla_srv: "faikolla2-node1"
+    openstack_conf_path: "/opt/cloud-cfg/vmcloud2/config"
+    public_ip: "192.168.26.60"
+    public_name: "vmcloud2"
+    public_int_tls: "no"
+    admin_passwd: "mypassword"

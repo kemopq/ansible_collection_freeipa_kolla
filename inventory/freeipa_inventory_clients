@@ -1,0 +1,9 @@
+[ipaclients]
+# faikolla1-node1.kemopq.test ansible_user=root
+# faikolla2-node1.kemopq.test ansible_user=root
+# vmcloud1-node1.kemopq.test ansible_user=root
+# vmcloud2-node1.kemopq.test ansible_user=root
+# vmcloud2-node2.kemopq.test ansible_user=root
+# vmcloud2-node3.kemopq.test ansible_user=root
+# centos1-vmcloud2.kemopq.test ansible_user=centos
+ubuntu1-vmcloud1.kemopq.test ansible_user=ubuntu
