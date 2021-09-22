@@ -1,12 +1,78 @@
 ---
-############################################################
-#  tasks file to configure Openstack
-############################################################
-- name: Config cloud block
-  include_tasks: cloud_config_deploy.yml
-  loop: "{{ clouds | dict2items }}"
-  loop_control:
-    loop_var: ii_cloud
-    label: "{{ ii_cloud.key }}"
-  when: (clouds is defined) and
-        ((ii_cloud.value.faikolla_srv is not defined) or (ii_cloud.value.faikolla_srv == inventory_hostname_short))
+# Keystone
+- name: Add identity section to keystone.conf - 1st param
+  ini_file:
+    path: "{{ node_custom_config }}/keystone.conf"
+    section: identity
+    option: domain_specific_drivers_enabled
+    value: "True"
+    mode: '0644'
+    state: present
+
+- name: Add identity section to keystone.conf - 2nd param
+  ini_file:
+    path: "{{ node_custom_config }}/keystone.conf"
+    section: identity
+    option: domain_config_dir
+    value: "/etc/keystone/domains"
+    mode: '0644'
+    state: present
+
+- name: Create a keystone domains folder
+  file:
+    path: "{{ node_custom_config }}/keystone/domains"
+    state: directory
+    mode: '0755'
+
+- name: Create keystone domain configuration file
+  vars:
+    suffix: ".{{ domain_name }}"
+    ipa_fqdn: "{{ ipa_integration_params.ipa_servers | product([suffix]) | map('join') | list | join(', ') }}"
+    user: "{{ ipa_integration_params.keystone_ipa_admin_user }}"
+    passwd: "{{ ipa_integration_params.keystone_ipa_admin_password }}"
+    dc_suffix: "{{ domain_name | kemopq.freeipa_kolla.gen_dc_suffix }}"
+  template:
+    dest: "{{ node_custom_config }}/keystone/domains/keystone.{{ item.key }}.conf"
+    src: keystone_domains.j2
+  loop: "{{ openstack_domains | dict2items }}"
+  when: (openstack_domains is defined)
+
+# Horizon
+- name: Set horizon multidomain support - 1st param
+  lineinfile:
+    path: "{{ node_custom_config }}/horizon/custom_local_settings"
+    regexp: ".*OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT.*"
+    line: "OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True"
+    state: present
+    create: 'yes'
+    mode: '0755'
+
+- name: Set horizon multidomain support - 2nd param
+  lineinfile:
+    path: "{{ node_custom_config }}/horizon/custom_local_settings"
+    regexp: ".*OPENSTACK_KEYSTONE_DOMAIN_DROPDOWN.*"
+    line: "OPENSTACK_KEYSTONE_DOMAIN_DROPDOWN = True"
+    state: present
+
+- name: Check if 3rd horizon parameter already exists
+  command: "cat {{ node_custom_config }}/horizon/custom_local_settings"
+  register: file_content
+
+- name: Set horizon multidomain support - 3rd param (param doesn't exist)
+  blockinfile:
+    path: "{{ node_custom_config }}/horizon/custom_local_settings"
+    block: |
+      OPENSTACK_KEYSTONE_DOMAIN_CHOICES = (
+          ('Default', 'default')
+      )
+    state: present
+  when: "'OPENSTACK_KEYSTONE_DOMAIN_CHOICES' not in file_content.stdout"
+
+- name: Set horizon multidomain support - 3rd param
+  lineinfile:
+    path: "{{ node_custom_config }}/horizon/custom_local_settings"
+    insertafter: 'OPENSTACK_KEYSTONE_DOMAIN_CHOICES'
+    line: "    ('{{ item.key }}', '{{ item.key }}'),"
+    state: present
+  loop: "{{ openstack_domains | dict2items }}"
+  when: (openstack_domains is defined)

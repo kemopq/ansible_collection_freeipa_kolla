@@ -9,6 +9,13 @@
   include_tasks: "os_client.yml"
   when: ii_domain.key not in os_domain_list
 
+- name: Restart Keystone
+  command: "itkf-maintenance-restart-service.sh -f {{ cloud_name }} keystone"
+
+- name: Pause for 2 minutes for Keystone to restart
+  pause:
+    minutes: 2
+
 - name: List os groups of domain "{{ ii_domain.key }}"
   vars:
     openstack_client_command: "group list --domain {{ ii_domain.key }}"

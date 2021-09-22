@@ -19,9 +19,6 @@ global_forwarders:
 dnssec_disable: 'yes'
 
 # default IPA users and groups
-freeipa_servers:
-  - "freeipa-server-node1.{{ ipaserver_domain }}"
-
 freeipa_groups:
   osadmins:
     desc: "Openstack admin group"
@@ -64,18 +61,8 @@ openstack_domains:
           osmembers:
             openstack_role: "admin"
 
-clouds:
-  vmcloud1:
-    faikolla_srv: "faikolla1-node1"
-    openstack_conf_path: "/opt/cloud-cfg/vmcloud1/config"  # location of configuration overrides (node_custom_config in kolla ansible globals.yml)
-    public_ip: "192.168.100.19"
-    public_name: "vmcloud1"
-    public_int_tls: "no"
-    admin_passwd: "iskratel"
-  vmcloud2:
-    faikolla_srv: "faikolla2-node1"
-    openstack_conf_path: "/opt/cloud-cfg/vmcloud2/config"
-    public_ip: "192.168.26.60"
-    public_name: "vmcloud2"
-    public_int_tls: "no"
-    admin_passwd: "mypassword"
+ipa_integration_params:
+  ipa_servers:
+    - ipasrv1
+  keystone_ipa_admin_user: "keyadmin"
+  keystone_ipa_admin_password: "kp1234"
