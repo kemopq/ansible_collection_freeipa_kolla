@@ -4,7 +4,7 @@
 ###################################################################
 - name: Create os domain
   vars:
-    openstack_client_command: "domain create --description '{{ ii_domain.value.description }}'  {{ ii_domain.key }}"
+    openstack_client_command: "domain create --description 'FreeIPACreated'  {{ ii_domain.key }}"
     cli_result: 'no'
   include_tasks: "os_client.yml"
   when: ii_domain.key not in os_domain_list

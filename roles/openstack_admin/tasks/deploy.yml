@@ -7,15 +7,14 @@
     openstack_client_command: "domain list"
     cli_result: 'yes'
   import_tasks: "os_client.yml"
-  when: false
-
-- name: DEBUG
-  debug:
-    var: osclient_result
 
 - name: Make os domains list
   set_fact:
     os_domain_list: "{{ osclient_result | kemopq.freeipa_kolla.os_domain_list }}"
+
+- name: Print current os domains
+  debug:
+    var: os_domain_list
 
 - name: Create os domains loop
   include_tasks: "os_domain_create.yml"

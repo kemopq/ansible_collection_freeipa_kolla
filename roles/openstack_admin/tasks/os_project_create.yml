@@ -5,7 +5,7 @@
 - name: Create os project "{{ ii_project.key }}"
   vars:
     openstack_client_command:
-      "project create --description '{{ ii_project.value.description }}' --domain {{ ii_domain.key }} {{ ii_project.key }}"
+      "project create --description 'FreeIPACreated' --domain {{ ii_domain.key }} {{ ii_project.key }}"
     cli_result: 'no'
   include_tasks: "os_client.yml"
   when: ii_project.key not in os_project_list

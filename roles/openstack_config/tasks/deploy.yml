@@ -1,4 +1,14 @@
 ---
+#check params
+- name: "Check input params"
+  assert:
+    that:
+      - ipa_integration_params is defined
+      - openstack_domains is defined
+      - openstack_domains | type_debug == "dict"
+    fail_msg: "Imput params ipa_integration_params or/and openstack_domains not defined or not dictionary"
+    quiet: 'yes'
+
 # Keystone
 - name: Add identity section to keystone.conf - 1st param
   ini_file:
@@ -26,11 +36,11 @@
 
 - name: Create keystone domain configuration file
   vars:
-    suffix: ".{{ domain_name }}"
-    ipa_fqdn: "{{ ipa_integration_params.ipa_servers | product([suffix]) | map('join') | list | join(', ') }}"
+    ipa_fqdn: "{{ ipa_integration_params.ipa_servers_fqdn | map('join') | list | join(', ') }}"
     user: "{{ ipa_integration_params.keystone_ipa_admin_user }}"
     passwd: "{{ ipa_integration_params.keystone_ipa_admin_password }}"
-    dc_suffix: "{{ domain_name | kemopq.freeipa_kolla.gen_dc_suffix }}"
+    ipa_domain: "{{ ipa_integration_params.ipa_servers_fqdn[0].split('.')[1:] | join ('.') }}"
+    dc_suffix: "{{ ipa_domain | kemopq.freeipa_kolla.gen_dc_suffix }}"
   template:
     dest: "{{ node_custom_config }}/keystone/domains/keystone.{{ item.key }}.conf"
     src: keystone_domains.j2
