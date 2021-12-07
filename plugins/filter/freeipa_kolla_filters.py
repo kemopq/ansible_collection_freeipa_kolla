@@ -38,6 +38,24 @@ def filter_group_list(in_list):
     return group_list
 
 
+# filter: get_dns_zone
+# Extract dns_zone and name from fqdn
+def filter_get_dns_zone(fqdns):
+    node = {}
+    ipa_domain_split = fqdns['ipa_domain'].split(".")
+    ipa_domain_len = len(ipa_domain_split)
+    node_fqdn_split = fqdns['node'].split(".")
+    node_fqdn_len = len(node_fqdn_split)
+    ii = 1
+    while ipa_domain_split[ipa_domain_len - ii] == node_fqdn_split[node_fqdn_len - ii]:
+        ii += 1
+        if ((ii > ipa_domain_len) or (ii > (node_fqdn_len-1))):
+            break
+    node['name'] = ".".join(node_fqdn_split[0:node_fqdn_len-ii+1])
+    node['dns_zone'] = ".".join(node_fqdn_split[node_fqdn_len-ii+1:])
+    return node
+
+
 # filter module
 class FilterModule(object):
     def filters(self):
@@ -45,5 +63,6 @@ class FilterModule(object):
                 'gen_dc_suffix': gen_dc_suffix,
                 'os_domain_list': filter_domain_list,
                 'os_project_list': filter_project_list,
-                'os_group_list': filter_group_list
+                'os_group_list': filter_group_list,
+                'get_dns_zone': filter_get_dns_zone
         }

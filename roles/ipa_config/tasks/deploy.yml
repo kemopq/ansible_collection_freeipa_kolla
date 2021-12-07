@@ -34,8 +34,8 @@
 
 - name: IPA DNS records block
   include_tasks: ipa_insert_cloud_name_deploy.yml
-  loop: "{{ clouds | dict2items }}"
+  loop: "{{ icp_clouds | dict2items }}"
   loop_control:
     loop_var: ii_cloud
     label: "{{ ii_cloud.key }}"
-  when: (clouds is defined)
+  when: (ii_cloud.value.add_cloud_name_to_dns is defined) and (ii_cloud.value.add_cloud_name_to_dns | bool)

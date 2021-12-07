@@ -1,9 +1,15 @@
 ---
 - name: Add DNS record for cloud "{{ ii_cloud.key }}"
+  vars:
+    cloud_url_split: "{{ ii_cloud.value.ext_url | urlsplit }}"
+    node_fqdns:
+      node: "{{ cloud_url_split.hostname }}"
+      ipa_domain: "{{ domain_name }}"
+    node_data: "{{ node_fqdns | kemopq.freeipa_kolla.get_dns_zone }}"
   freeipa.ansible_freeipa.ipadnsrecord:
     ipaadmin_password: "{{ ipaadmin_password }}"
-    zone_name: "{{ ipaserver_domain }}"
+    zone_name: "{{ node_data.dns_zone }}"
     record_type: 'A'
-    name: "{{ ii_cloud.value.public_name }}"
-    record_value: "{{ ii_cloud.value.public_ip }}"
+    name: "{{ node_data.name }}"
+    record_value: "{{ ii_cloud.value.ext_float_ip }}"
     state: present
